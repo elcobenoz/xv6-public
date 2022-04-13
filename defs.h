@@ -120,8 +120,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-void            mprotect(void);
-void            munprotect(void);
+int             mprotect(void *addr, int len);
+int            munprotect(void *addr, int len);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -534,15 +534,3 @@ procdump(void)
     cprintf("\n");
   }
 }
-
-void
-mprotect(void)
-{
-  cprintf("mprotect");
-}
-
-void
-munprotect(void)
-{
-  cprintf("munprotect");
-}

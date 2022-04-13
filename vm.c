@@ -398,4 +398,62 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 // Blank page.
 //PAGEBREAK!
 // Blank page.
+int
+mprotect(void *addr, int len){
+  struct proc *curproc = myproc();
+  
+  if(len <= 0 || (int)addr+len*PGSIZE>curproc->vlimit - curproc->vbase){
+    cprintf("Incorrect len, given: ", len);
+    return -1;
+  }
 
+  if((int)(((int) addr) % PGSIZE )  != 0){
+    cprintf("Incorrect address, given: ", addr);
+    return -1;
+  }
+
+  int i;
+  pte_t *pte;
+  for (i = (int) addr; i < ((int) addr + (len) *PGSIZE); i= i + PGSIZE){
+    pte = walkpgdir(curproc->pgdir,(void*) i, 0);
+    if(((*pte & PTE_U) != 0) && ((*pte & PTE_P) != 0) && pte ){
+      *pte &= ~PTE_W;
+      cprintf("PTE: ", pte);
+    } else {
+      return -1;
+    }
+  }
+
+  lcr3(V2P(curproc->pgdir));  
+  return 0;
+}
+
+int
+munprotect(void *addr, int len){
+  struct proc *curproc = myproc();
+  
+  if(len <= 0 || (int)addr+len*PGSIZE>curproc->vlimit - curproc->vbase){
+    cprintf("Incorrect len, given: ", len);
+    return -1;
+  }
+
+  if((int)(((int) addr) % PGSIZE )  != 0){
+    cprintf("Incorrect address, given: ", addr);
+    return -1;
+  }
+
+  int i;
+  pte_t *pte;
+  for (i = (int) addr; i < ((int) addr + (len) *PGSIZE); i= i + PGSIZE){
+    pte = walkpgdir(curproc->pgdir,(void*) i, 0);
+    if(((*pte & PTE_U) != 0) && ((*pte & PTE_P) != 0) && pte ){
+      *pte &= ~PTE_W;
+      cprintf("PTE: ", pte);
+    } else {
+      return -1;
+    }
+  }
+
+  lcr3(V2P(curproc->pgdir));
+  return 0;
+}
